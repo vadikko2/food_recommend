@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+
+  mongodb:
+    image: mongo:4.0.12
+    ports:
+      - 27017:27017
+
+  rabbitmq:
+    image: rabbitmq:3.6-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  redis:
+    image: "redis:5"
+
+#  elasticsearch:
+#    build: elasticsearch/
+#    volumes:
+#      - ./elasticsearch/config/elasticsearch.yml:elasticsearch/config/elasticsearch.yml
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+#    environment:
+#      - cluster.name=elasticsearch
+#      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+#      - XPACK_SECURITY_ENABLED=false
+#    networks:
+#      - elk
+#    healthcheck:
+#      test: "curl http://elasticsearch:9200"
+#      interval: "1s"
+#      timeout: "3s"
+#      retries: 60
+
+  api:
+    build: api/
+    command: python3 ./wsgi.py
+    ports:
+      - 5000:5000
+    environment:
+      - DOCKER=true
+    volumes:
+      - ./orm/:/orm/
+      - ./alerts/:/alerts/
+      - ./api/:/api/
+    depends_on:
+      #- elasticsearch
+      - rabbitmq
+      - redis
+      - mongodb
+
+  crawler:
+    build: crawler/
+    environment:
+      - DOCKER=true
+    volumes:
+      - ./orm/:/orm/
+      - ./database/:/database/
+      - ./alerts/:/alerts/
+      - ./crawler/:/crawler/
+
+    depends_on:
+      - rabbitmq
+      - mongodb
+      #- elasticsearch
+
+    entrypoint: python3
+
+networks:
+  elk:
+    driver: bridge

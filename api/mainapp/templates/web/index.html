@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<head>
+    <style >
+        p {
+            max-height: 200px;
+            overflow: auto;
+        }
+        section.hero-section {
+            overflow: auto;
+        }
+    </style>
+    <title>Taste Assistant | Главная</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Taste Assistant">
+    <meta name="keywords" content="Food">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/elegant-icons.css"/>
+    <link rel="stylesheet" href="css/owl.carousel.min.css"/>
+
+    <!-- Main Stylesheets -->
+    <link rel="stylesheet" href="css/style.css"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+<!-- Page Preloder -->
+<div id="preloder">
+    <div class="loader"></div>
+</div>
+
+<!-- Offcanvas Menu Section -->
+<div class="offcanvas-menu-wrapper">
+    <div class="menu-header">
+        <a href="/" class="site-logo">
+            <img src="img/img/logo_5.png" alt="">
+        </a>
+        <div class="menu-switch" id="menu-canvas-close">
+            <i class="icon_close"></i>
+        </div>
+    </div>
+    <ul class="main-menu">
+        <li><a href="/" class="active">Домой</a></li>
+        <li><a href="/gallery">Рецепты</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="menu-footer">
+        <div class="footer-social">
+            {% for contact, url in contacts.items() %}
+                <a href="{{url}}">{{contact}}</a>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+<!-- Offcanvas Menu Section end -->
+
+<!-- Header section -->
+<header class="header-section">
+    <a href="/" class="site-logo">
+        <img src="img/img/logo_5.png" alt="">
+    </a>
+    <div class="menu-switch" id="menu-canvas-show">
+        <i class="icon_menu"></i>
+    </div>
+</header>
+<!-- Header section end -->
+
+<!-- Hero section -->
+
+<section class="hero-section">
+    <div class="hero-slider owl-carousel">
+        <!--Сюда подсовывать элементы списка из бэкенда-->
+        {% for card in cards %}
+        <div class="hero-item">
+            <div class="hero-text">
+                {% for tag in card.tags %}
+                    <div class="ht-cata">{{tag}}</div>
+                {% endfor %}
+                <h2>{{card.title}}</h2>
+                <p>{{card.summary}}</p>
+                <a href="{{card.url}}" class="ht-btn">Подробнее <i class="arrow_right"></i></a>
+            </div>
+            <div class="hi-bg set-bg"
+                     data-setbg="{{card.pict_url}}"></div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Hero section end -->
+
+<!-- Footer section -->
+<footer class="footer-section">
+    <div class="footer-social">
+        {% for contact, url in contacts.items() %}
+            <a href="{{url}}">{{contact}}</a>
+        {% endfor %}
+    </div>
+</footer>
+<!-- Footer section end -->
+
+<!--====== Javascripts & Jquery ======-->
+<script src="js/vendor/jquery-3.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/masonry.pkgd.min.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
