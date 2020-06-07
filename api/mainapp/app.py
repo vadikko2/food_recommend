@@ -17,7 +17,7 @@ from models import models
 '''
 
 logging.config.fileConfig(LOG_CONFIG)
-logger = logging.getLogger("TasteAssistant")
+logger = logging.getLogger("test_assistant_api")
 
 '''
 Подключаемся к базам данных
