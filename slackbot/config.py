@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 if not Path('api.token').exists():
-    print('The token file is not exists.')
+    print('The token file is not exists.'), exit()
 
 API_TOKEN = ''
 

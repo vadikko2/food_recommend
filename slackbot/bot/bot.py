@@ -35,14 +35,14 @@ def notify(kwargs):
                                 kwargs['RABBIT_PASSWORD'], kwargs['QUEUE_NAME'])
         bot_client = Bot(kwargs['API_TOKEN'], kwargs['SLACK_CHANNEL'])
 
-        logger.info(f" Bot for {kwargs['SLACK_CHANNEL']} channel getting up.")
+        logger.info(f" Bot for {kwargs['SLACK_CHANNEL']} slack channel getting up.")
 
         rabbit_channel.channel.basic_consume(queue=kwargs['QUEUE_NAME'],
                                              auto_ack=True,
                                              on_message_callback=bot_client.post)
 
-        logger.info(f" Consumer for {kwargs['QUEUE_NAME']} getting up.")
-
+        logger.info(f" Consumer for {kwargs['QUEUE_NAME']} queue getting up.")
+        
         rabbit_channel.channel.start_consuming()
     except Exception as e:
         logger.error(f"Some troubles with {kwargs['SLACK_CHANNEL']} bot: {e}")
