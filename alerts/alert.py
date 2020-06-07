@@ -1,6 +1,5 @@
 import pika
 
-
 class Alerts:
 
     def __init__(self, host, port, login, password, queue_name):
@@ -14,16 +13,11 @@ class Alerts:
         # Если очередь с указанным именем не существует, queue_declare() создаст ее
         self.channel.queue_declare(queue=self.queue_name)
 
+    def __enter__(self):
+        return self
+
     def alert(self, message):
         self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=message)
 
-    def catch_alert(self):
-        method_frame, header_frame, body = self.channel.basic_get('alerts')
-        message = None
-        if method_frame:
-            message = body.decode()
-            self.channel.basic_ack(method_frame.delivery_tag)
-        return message
-
-    def __del__(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self.connection.close()

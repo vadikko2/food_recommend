@@ -5,7 +5,7 @@ import sys
 sys.path.append('../')
 from orm.elastic_client import FoodElasticClient
 from orm.mongo_client import FoodMongoClient
-sys.path.append('./')
+from alerts.alert import Alerts
 
 DATABASE_NAME = "food"
 
@@ -25,7 +25,6 @@ if os.environ.get("DOCKER") == "true":
     RABBIT_HOST = 'rabbit'
 else:
     BASE_PATH = Path("../database/")
-    MODELS_PATH = Path("../models/")
     LOG_PATH = Path("../logs")
     LOG_CONFIG = Path("../logging.ini")
     MONGODB_CONNECTION = FoodMongoClient("localhost", 27017, DATABASE_NAME)

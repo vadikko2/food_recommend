@@ -1,16 +1,20 @@
-import sys
+import concurrent.futures
+import logging
+import logging.config
 
-from bot.bot import Bot
-from config import RABBIT_QUEUE_NAME, RABBIT_PORT, RABBIT_HOST, RABBIT_PASSWORD, API_TOKEN, SLACK_CHANNEL
+from bot.bot import notify
+from config import ALERT_FLOWS, LOG_CONFIG
 
-sys.path.append('../')
-from alerts.alert import Alerts
+'''
+Читаем конфиг для логера
+'''
 
-rabbit_channel = Alerts(RABBIT_HOST, RABBIT_PORT, RABBIT_PASSWORD, RABBIT_PASSWORD, RABBIT_QUEUE_NAME)
-bot_client = Bot(API_TOKEN, SLACK_CHANNEL)
-rabbit_channel.channel.basic_consume(queue=RABBIT_QUEUE_NAME,
-                                     auto_ack=True,
-                                     on_message_callback=bot_client.post)
+logging.config.fileConfig(LOG_CONFIG)
+logger = logging.getLogger("test_assistant_slack_bot")
 
-print(' [*] Waiting for messages. To exit press CTRL+C')
-rabbit_channel.channel.start_consuming()
+try:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(ALERT_FLOWS)) as executor:
+        executor.map(notify, ALERT_FLOWS)
+except Exception as e:
+    logger.error(f"Error while notify working: {e}")
+
