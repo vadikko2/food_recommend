@@ -2,4 +2,4 @@ __pycache__/
 .DS_Store
 db.sqlite
 read_q.py
-test_alert.py
+../../alerts/test_alert.py

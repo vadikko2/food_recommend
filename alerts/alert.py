@@ -1,5 +1,6 @@
 import pika
 
+
 class Alerts:
 
     def __init__(self, host, port, login, password, queue_name):
