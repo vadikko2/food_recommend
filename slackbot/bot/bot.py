@@ -20,7 +20,8 @@ class Bot:
             self.slack_client.api_call(
                 "chat.postMessage",
                 channel=self.channel,
-                text=body
+                text=body,
+                as_user=True,
             )
         except Exception as e:
             logger.error(f"Error while post message from {self.channel}: {e}")
@@ -42,7 +43,7 @@ def notify(kwargs):
                                              on_message_callback=bot_client.post)
 
         logger.info(f" Consumer for {kwargs['QUEUE_NAME']} queue getting up.")
-        
+
         rabbit_channel.channel.start_consuming()
     except Exception as e:
         logger.error(f"Some troubles with {kwargs['SLACK_CHANNEL']} bot: {e}")
