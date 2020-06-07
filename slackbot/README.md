@@ -1,6 +1,6 @@
 # Slack Alert Bot
 
-The slack alert bot module read messages about different events from configured RabbitMQ queues and push them to 
+The slack alert bot module read messages about different events from allocated RabbitMQ queues and push them to 
 appropriate slack channels.
 
 There are some steps for deploy alert bot.
@@ -10,5 +10,5 @@ There are some steps for deploy alert bot.
 3. Create necessary Channels in your Workplace and add Application to it.
 4. Configure ```config.py``` file:
     - set ```RABBIT_LOGIN``` and ```RABBIT_PASSWORD```
-    - add to the ```ALERT_FLOWS``` pairs ```QUEUE_NAME``` and ```SLACK_CHANNEL```.
+    - add pairs ```QUEUE_NAME``` and ```SLACK_CHANNEL``` to the ```ALERT_FLOWS```.
 5. Run ```runner.py``` script.
