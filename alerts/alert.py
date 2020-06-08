@@ -1,5 +1,7 @@
-import pika
 import traceback
+
+import pika
+
 
 class Alerts:
 
@@ -26,9 +28,11 @@ class Alerts:
 
 def alert(message, **kwargs):
     try:
-        message = f'{"".join(["-"]*15)}New Message{"".join(["-"]*15)}' \
+        message = f'{"".join(["-"] * 15)}New Message{"".join(["-"] * 15)}' \
                   f'\n\n{message}'.encode()
+
         with Alerts(**kwargs) as alerts_obj:
             alerts_obj.alert(message=message)
+
     except Exception:
         raise ValueError(f'Error while alert: {traceback.format_exc()}')

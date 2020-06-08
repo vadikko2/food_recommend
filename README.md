@@ -10,6 +10,11 @@
 
 ### Up
 
+- Run Alert Bot
+
+```
+    docker-compose run --rm -d slackbot
+```
 
 - Update data
 
@@ -22,3 +27,4 @@
 ```
     docker-compose run --rm -d api
 ```
+

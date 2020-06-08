@@ -3,7 +3,7 @@ import json
 import sys
 from datetime import datetime
 
-from config import MONGODB_CONNECTION, ELASTICSEARCH_CONNECTION, LOG_PATH, BASE_PATH
+from config import MONGODB_CONNECTION, ELASTICSEARCH_CONNECTION, LOG_PATH, BASE_PATH, DATA_SOURCES
 from sources.collector import Collector
 
 if __name__ == '__main__':
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     if options.load:  # TODO Задавать список источников в конфиге. Создавать list со ссылками на классы.
         print(f'Action --load triggered')
-        with Collector(base_path=BASE_PATH) as col:
+        with Collector(base_path=BASE_PATH, sources=DATA_SOURCES) as col:
             col.load_all()
 
     if options.save:

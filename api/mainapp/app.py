@@ -10,13 +10,14 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 '''
-Импорт модуля для работы с моделями
+    Импорт модуля для работы с моделями
 '''
+
 from config import *
 from models import models
 
 '''
-Иморт функции, кидающей алерты
+    Иморт функции, кидающей алерты
 '''
 
 from config import ALERT_SETTINGS
@@ -25,23 +26,29 @@ sys.path.append('../')
 from alerts.alert import alert
 
 '''
-Читаем конфиг для логера
+    Читаем конфиг для логера
 '''
 
 logging.config.fileConfig(LOG_CONFIG)
 logger = logging.getLogger("test_assistant_api")
 
 '''
-Подключаемся к базам данных
+    Подключаемся к базам данных
 '''
 
-db = MONGODB_CONNECTION
-sqlite_db = SQLITE_DB
-elastic = ELASTICSEARCH_CONNECTION
+try:
+    db = MONGODB_CONNECTION
+    sqlite_db = SQLITE_DB
+    elastic = ELASTICSEARCH_CONNECTION
+except Exception:
+    message = f'Ошибка подключения к базам данных: {traceback.format_exc()}'
+    logger.error(message)
+    alert(message, **ALERT_SETTINGS), exit()
 
 '''
     Выгрузка векторов для рекоммендаций
 '''
+
 try:
     rn2t, rk2t, t2rn, t2rk = models.get_w2v_kdtree_dicts(MODELS_PATH)
     kdtree = models.get_w2v_kdtree(MODELS_PATH)
@@ -54,6 +61,7 @@ except Exception:
 '''
     Подключение к модулю, предоставлющему инфу по чекам
 '''
+
 response = requests.get('https://proverkacheka.nalog.ru:9999/v1/mobile/users/login',
                         auth=(PHONE_NUMBER, BILL_PASS))
 
@@ -66,6 +74,10 @@ logger.info(
     f'Успешная авторизация на proverkacheka.nalog.ru \n'
     f'Ответ сервера: CODE {response.status_code} {json.dumps(json.loads(response.content), indent=4)}')
 
+'''
+    Подключение к Redis
+'''
+
 try:
     cache = Cache(config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/0'})
 except Exception:
@@ -73,6 +85,9 @@ except Exception:
     logger.error(message)
     alert(message, **ALERT_SETTINGS), exit()
 
+'''
+    Запуск API
+'''
 try:
     app = Flask(__name__)
 

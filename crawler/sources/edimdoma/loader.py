@@ -2,16 +2,23 @@ import hashlib
 import json
 import pprint
 import re
+import traceback
 
 import requests
 from lxml import html
 from lxml.etree import tostring
 from tqdm import tqdm
 
+
 class EdimDoma:
     __name__ = 'edimdoma'
 
-    def __init__(self, base_path):
+    def __init__(self, base_path, logger, alert_function, alert_settings):
+        self.logger = logger
+
+        self.alert = alert_function
+        self.alert_settings = alert_settings
+
         self.url = "https://www.edimdoma.ru/retsepty?page=#"
         self.base_path = base_path / self.__name__
 
@@ -50,7 +57,9 @@ class EdimDoma:
             try:
                 self.parse_page(page)
             except Exception as e:
-                print(f'Ошибка при обработке страницы: {e}')
+                message = f'Ошибка при обработке страницы:\n {traceback.format_exc()}'
+                self.logger.error(message)
+                self.alert(message, **self.alert_settings)
 
         '''
         Загружаем сами рецепты
@@ -59,7 +68,9 @@ class EdimDoma:
             try:
                 self.parse_recipes(url)
             except Exception as e:
-                print(f'Ошибка при парсинге страницы с рецептом: {e}')
+                message = f'Ошибка при парсинге страницы с рецептом:\n {traceback.format_exc()}'
+                self.logger.error(message)
+                self.alert(message, **self.alert_settings)
 
     def parse_page(self, number):
         page_url = self.url.replace('#', str(number))
