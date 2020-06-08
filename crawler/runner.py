@@ -1,12 +1,12 @@
 import argparse
-import sys, json
-from config import MONGODB_CONNECTION, ELASTICSEARCH_CONNECTION, LOG_PATH, BASE_PATH
-from sources.collector import Collector
+import json
+import sys
 from datetime import datetime
 
-if __name__ == '__main__':
+from config import MONGODB_CONNECTION, ELASTICSEARCH_CONNECTION, LOG_PATH, BASE_PATH
+from sources.collector import Collector
 
-    # TODO добавить логер (конфиг в logging.ini)
+if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--load', action='store_const', const=True)
@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     options = parser.parse_args(sys.argv[1:])
 
-    if options.load:
+    if options.load:  # TODO Задавать список источников в конфиге. Создавать list со ссылками на классы.
         print(f'Action --load triggered')
         with Collector(base_path=BASE_PATH) as col:
             col.load_all()
