@@ -12,12 +12,12 @@ class Logger:
 
     def warning(self, message, alert=False):
         self.logger.warning(message)
-        if alert: self.alert_function(message, **self.alert_settings)
+        if alert: self.alert_function(message, 'WARNING', **self.alert_settings)
 
     def info(self, message, alert=False):
         self.logger.info(message)
-        if alert: self.alert_function(message, **self.alert_settings)
+        if alert: self.alert_function(message, 'INFO', **self.alert_settings)
 
     def debug(self, message, alert=False):
         self.logger.debug(message)
-        if alert: self.alert_function(message, **self.alert_settings)
+        if alert: self.alert_function(message, 'DEBUG', **self.alert_settings)

@@ -1,22 +1,27 @@
+import json
+import re
+
 import requests
 from lxml import html
-import re
-import json
 
 
 class EdaRu:
     __name__ = 'edaru'
 
-    def __init__(self, base_path):
+    def __init__(self, base_path, logger):
 
+        self.logger = logger
         db_name = 'recipes.json'
-        ingredients_name = 'ingredients.json',
+        ingredients_name = 'ingredients.json'
         tags_name = 'tags.json'
-        database_path = base_path / self.__name__
 
-        self.db_name = database_path / db_name
-        self.ingredients_name = database_path / ingredients_name
-        self.tags_name = database_path / tags_name
+        self.database_path = base_path
+
+        if not self.database_path.exists(): self.database_path.mkdir(parents=True)
+
+        self.db_name = self.database_path / db_name
+        self.ingredients_name = self.database_path / ingredients_name
+        self.tags_name = self.database_path / tags_name
 
         self.db = []
         self.ingredients_db = {}
@@ -42,7 +47,7 @@ class EdaRu:
             return html.fromstring(body)
 
         elif response.status_code == 404:
-            print('Not Found. URL: {}'.format(search_url))
+            self.logger.warning('Not Found. URL: {}'.format(search_url), alert=True)
 
             return False
 
@@ -250,12 +255,12 @@ class EdaRu:
         with open(name, 'wt') as f:
             json.dump(_json, f, sort_keys=False, indent=4, ensure_ascii=False)
 
-    def load(self, max_page=None):
+    def load(self):
 
         page = 1
         while True:
-
-            print("Loading page {}".format(page))
+            if page > 10: break  # TODO remove
+            self.logger.info("Loading page {}".format(page))
             search_url = self.get_recipes(page)
 
             parsed_page = self.get_page(search_url)
@@ -263,12 +268,8 @@ class EdaRu:
             if not parsed_page:
                 break
 
-            if (not max_page is None) & (page >= max_page):
-                break
-
             page += 1
 
         self.dump_json(self.db, self.db_name)
         self.dump_json(self.convert_ingredients_db(), self.ingredients_name)
         self.dump_json(self.convert_tags_db(), self.tags_name)
-

@@ -1,5 +1,5 @@
 import traceback
-
+import datetime
 import pika
 
 
@@ -26,10 +26,10 @@ class Alerts:
         self.connection.close()
 
 
-def alert(message, **kwargs):
+def alert(message, alert_type='INFO', **kwargs):
     try:
-        message = f'{"".join(["-"] * 15)}New Message{"".join(["-"] * 15)}' \
-                  f'\n\n{message}'.encode()
+        message = f'{alert_type} {datetime.datetime.now()}\n' \
+                  f'{message}'.encode()
 
         with Alerts(**kwargs) as alerts_obj:
             alerts_obj.alert(message=message)

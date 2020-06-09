@@ -1,7 +1,9 @@
-from config import ALERT_FUNCTION, ALERT_SETTINGS
-from config import LOG_CONFIG, Logger
-
+import json
 import logging.config
+from datetime import datetime
+
+from config import ALERT_FUNCTION, ALERT_SETTINGS, DB_INFO_ALERT_SETTINGS, MONGODB_CONNECTION, LOG_PATH
+from config import LOG_CONFIG, Logger
 
 logging.config.fileConfig(LOG_CONFIG)
 collector_logger = Logger(logging.getLogger("test_assistant_crawler.collector"),
@@ -13,7 +15,7 @@ class Collector:
 
     def __init__(self, base_path, sources):
         self.sources = list(
-            map(lambda source: sources[source](base_path,
+            map(lambda source: sources[source](base_path / source,
                                                Logger(logging.getLogger(f"test_assistant_crawler.{source}"),
                                                       ALERT_FUNCTION,
                                                       ALERT_SETTINGS)),
@@ -22,8 +24,28 @@ class Collector:
     def load_all(self):
 
         for module in self.sources:
-            collector_logger.info(f'Выполняется загрузка данных из источника {module.__name__}', alert=True)
+            ALERT_FUNCTION(f'Выполняется загрузка данных из источника {module.__name__}', **DB_INFO_ALERT_SETTINGS)
             module.load()
+
+    def save_all(self):
+        save_report = {}
+        for module in self.sources:
+            ALERT_FUNCTION(f'Выполняется сохранение данных для источника {module.__name__}', **DB_INFO_ALERT_SETTINGS)
+
+            update_result = MONGODB_CONNECTION.update_mongo(module.database_path)
+
+            with open(LOG_PATH / f'{module.__name__}_updated_{datetime.now().strftime("%d-%b-%Y_%H:%M:%S.%f")}.json',
+                      'w') as reportf:
+                report = json.dumps(update_result, indent=4, ensure_ascii=False)
+                reportf.write(report)
+
+            save_report[module.__name__] = {}
+            for collection in update_result:
+                save_report[module.__name__][collection] = {}
+                for _type in update_result[collection]:
+                    save_report[module.__name__][collection][_type] = len(update_result[collection][_type])
+
+        return json.dumps(save_report, indent=4, sort_keys=True, ensure_ascii=False)
 
     def __enter__(self):
         return self

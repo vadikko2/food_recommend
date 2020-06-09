@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 from sources.edimdoma.loader import EdimDoma
+from sources.eda.loader import EdaRu
 
 sys.path.append('../')
 from core.orm.elastic_client import FoodElasticClient
@@ -19,7 +20,7 @@ if os.environ.get("DOCKER") == "true":
     LOG_PATH = Path("./logs")  # папка с логами
     LOG_CONFIG = "./logging.ini"  # конфиг для логов
     MONGODB_CONNECTION = FoodMongoClient("mongodb", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, "food",
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, DATABASE_NAME,
                                                  "previews")  # TODO add docker image
     RABBIT_HOST = 'rabbitmq'
 else:
@@ -27,7 +28,7 @@ else:
     LOG_PATH = Path("./logs")
     LOG_CONFIG = Path("./logging.ini")
     MONGODB_CONNECTION = FoodMongoClient("localhost", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, "food", "previews")
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, DATABASE_NAME, "previews")
     RABBIT_HOST = 'localhost'
 
 '''
@@ -41,6 +42,7 @@ Logger = Logger
 '''
 RABBIT_PORT = 5672
 RABBIT_QUEUE_NAME = 'crawler-errors'
+RABBIT_DB_INFO_QUEUE_NAME = 'db-updates'
 RABBIT_LOGIN = 'guest'
 RABBIT_PASSWORD = 'guest'
 
@@ -52,11 +54,20 @@ ALERT_SETTINGS = dict(
     queue_name=RABBIT_QUEUE_NAME
 )
 
+DB_INFO_ALERT_SETTINGS = dict(
+    host=RABBIT_HOST,
+    port=RABBIT_PORT,
+    login=RABBIT_LOGIN,
+    password=RABBIT_PASSWORD,
+    queue_name=RABBIT_DB_INFO_QUEUE_NAME
+)
 ALERT_FUNCTION = alert
+
 
 '''
     Источники данных
 '''
 DATA_SOURCES = dict(
     edimdoma=EdimDoma,
+    edaru=EdaRu
 )

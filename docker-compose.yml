@@ -5,7 +5,10 @@ services:
   mongodb:
     image: mongo:4.0.12
     ports:
-      - 27017:27017
+      - 27018:27017
+    environment:
+      USER: root
+      PASS: root
 
   rabbitmq:
     image: rabbitmq:3.6-management-alpine

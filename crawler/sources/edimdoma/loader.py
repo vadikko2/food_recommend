@@ -2,7 +2,7 @@ import hashlib
 import json
 import pprint
 import re
-import traceback
+from traceback import format_exc as trace
 
 import requests
 from lxml import html
@@ -17,9 +17,9 @@ class EdimDoma:
         self.logger = logger
 
         self.url = "https://www.edimdoma.ru/retsepty?page=#"
-        self.base_path = base_path / self.__name__
+        self.database_path = base_path
 
-        if not self.base_path.exists(): self.base_path.mkdir(parents=True)
+        if not self.database_path.exists(): self.database_path.mkdir(parents=True)
 
         self.recipe_urls = set()
 
@@ -54,7 +54,7 @@ class EdimDoma:
             try:
                 self.parse_page(page)
             except Exception as e:
-                message = f'Ошибка при обработке страницы:\n {traceback.format_exc()}'
+                message = f'Ошибка при обработке страницы:\n {e}'
                 self.logger.error(message, alert=True)
 
         '''
@@ -64,7 +64,7 @@ class EdimDoma:
             try:
                 self.parse_recipes(url)
             except Exception as e:
-                message = f'Ошибка при парсинге страницы с рецептом:\n {traceback.format_exc()}'
+                message = f'Ошибка при парсинге страницы с рецептом:\n {trace()}'
                 self.logger.error(message, alert=True)
 
     def parse_page(self, number):
@@ -73,7 +73,7 @@ class EdimDoma:
         try:
             page = requests.get(page_url).content.decode()
         except Exception as e:
-            raise ValueError(f'Ошибка загрузки страницы {page_url}: {e}')
+            raise ValueError(f'Ошибка загрузки страницы {page_url}: {trace()}')
 
         try:
             self.recipe_urls.update(list(

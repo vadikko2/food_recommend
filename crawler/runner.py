@@ -1,10 +1,16 @@
 import argparse
-import json
+import logging.config
 import sys
-from datetime import datetime
 
-from config import MONGODB_CONNECTION, ELASTICSEARCH_CONNECTION, LOG_PATH, BASE_PATH, DATA_SOURCES
+from config import ELASTICSEARCH_CONNECTION, BASE_PATH, DATA_SOURCES, ALERT_FUNCTION, \
+    ALERT_SETTINGS, DB_INFO_ALERT_SETTINGS
+from config import LOG_CONFIG, Logger
 from sources.collector import Collector
+
+logging.config.fileConfig(LOG_CONFIG)
+logger = Logger(logging.getLogger("test_assistant_crawler.runner"),
+                ALERT_FUNCTION,
+                ALERT_SETTINGS)
 
 if __name__ == '__main__':
 
@@ -16,25 +22,38 @@ if __name__ == '__main__':
 
     options = parser.parse_args(sys.argv[1:])
 
-    if options.load:  # TODO Задавать список источников в конфиге. Создавать list со ссылками на классы.
-        print(f'Action --load triggered')
-        with Collector(base_path=BASE_PATH, sources=DATA_SOURCES) as col:
-            col.load_all()
+    col = Collector(base_path=BASE_PATH, sources=DATA_SOURCES)
+
+    if options.load:
+        logger.info('Action --load triggered', alert=True)
+        ALERT_FUNCTION('Action --load triggered', **DB_INFO_ALERT_SETTINGS)
+
+        col.load_all()  # TODO добавить какой-нибудь report об окончании загрузки с информацией о результатах
 
     if options.save:
-        print('Action --save triggered')
-        update_result = MONGODB_CONNECTION.update_mongo()
-        with open(LOG_PATH / f'updated_{datetime.now().strftime("%d-%b-%Y_%H:%M:%S.%f")}.json',
-                  'w') as saved_report:
-            saved_report.write(json.dumps(update_result, indent=4))
+        logger.info('Action --save triggered', alert=True)
+        ALERT_FUNCTION('Action --save triggered', **DB_INFO_ALERT_SETTINGS)
+
+        report = col.save_all()
+
+        ALERT_FUNCTION(report, **DB_INFO_ALERT_SETTINGS)
+
+        logger.info('Action --save completed', alert=True)
+
+        ALERT_FUNCTION('Action --save completed', **DB_INFO_ALERT_SETTINGS)
 
     if options.drop_elastic:
-        print('Action --drop_elastic triggered')
+        logger.info('Action --drop_elastic triggered', alert=True)
+        ALERT_FUNCTION('Action --drop_elastic triggered', **DB_INFO_ALERT_SETTINGS)
+
         ELASTICSEARCH_CONNECTION.delete()
 
     if options.migrate:
-        # TODO uncomment
-        # import stanza
-        # stanza.download('ru')
-        print('Action --migrate triggered')
+        import stanza
+
+        stanza.download('ru')
+
+        logger.info('Action --migrate triggered', alert=True)
+        ALERT_FUNCTION('Action --migrate triggered', **DB_INFO_ALERT_SETTINGS)
+
         ELASTICSEARCH_CONNECTION.migrate()

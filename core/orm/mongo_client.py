@@ -9,22 +9,18 @@ from pymongo import MongoClient
 
 class FoodMongoClient:
     def __init__(self, host, port, db):
-        self.base_path = db
         self.connection = MongoClient(host, port)
-        self.db = self.connection[self.base_path]
+        self.db = self.connection[db]
 
-    def __del__(self):
-        self.connection.close()
-
-    def update_mongo(self):
+    def update_mongo(self, path):
         # Проверяем, что папка с файликами есть
-        if not self.base_path.exists():
-            print(f"{self.base_path} is not exists.")
+        if not path.exists():
+            print(f"{path} is not exists.")
             return []
 
         updated_ids_dict = {}
 
-        for file in os.listdir(self.base_path):
+        for file in os.listdir(path):
             if not (".json" in file):
                 continue
             essence = file.replace(".json", "")
@@ -34,7 +30,7 @@ class FoodMongoClient:
             # забираем чексуммы
             exist_id_set = self.db[collection_name].distinct("id")
 
-            with open(self.base_path / file, "r") as ovalfile:
+            with open(path / file, "r") as ovalfile:
                 data = loads(ovalfile.read())
 
             # Выбираем подгруженные айдишники и чексуммы
