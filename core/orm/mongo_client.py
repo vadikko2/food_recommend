@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging.config
 import os
 import pickle
 
@@ -15,8 +16,7 @@ class FoodMongoClient:
     def update_mongo(self, path):
         # Проверяем, что папка с файликами есть
         if not path.exists():
-            print(f"{path} is not exists.")
-            return []
+            raise ValueError(f"{path} is not exists.")
 
         updated_ids_dict = {}
 

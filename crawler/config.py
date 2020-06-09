@@ -69,5 +69,5 @@ ALERT_FUNCTION = alert
 '''
 DATA_SOURCES = dict(
     edimdoma=EdimDoma,
-    edaru=EdaRu
+    #edaru=EdaRu
 )

@@ -2,7 +2,6 @@ import hashlib
 import json
 import pprint
 import re
-from traceback import format_exc as trace
 
 import requests
 from lxml import html
@@ -39,7 +38,9 @@ class EdimDoma:
         try:
             pages = tree.xpath('/html/body/div[6]/div[3]/div/div[1]/div[4]/div[2]/div')[0]
         except Exception as e:
-            raise ValueError(f'Ошибка при попытке выбора списка номеров сьтраниц с рецептами: {e}')
+            message = f'Ошибка при попытке выбора списка номеров сьтраниц с рецептами: {e}'
+            self.logger.error(message, alert=True)
+            return None
 
         for item in pages:
             try:
@@ -64,7 +65,7 @@ class EdimDoma:
             try:
                 self.parse_recipes(url)
             except Exception as e:
-                message = f'Ошибка при парсинге страницы с рецептом:\n {trace()}'
+                message = f'Ошибка при парсинге страницы с рецептом:\n {e}'
                 self.logger.error(message, alert=True)
 
     def parse_page(self, number):
@@ -73,7 +74,7 @@ class EdimDoma:
         try:
             page = requests.get(page_url).content.decode()
         except Exception as e:
-            raise ValueError(f'Ошибка загрузки страницы {page_url}: {trace()}')
+            raise ValueError(f'Ошибка загрузки страницы {page_url}: {e}')
 
         try:
             self.recipe_urls.update(list(

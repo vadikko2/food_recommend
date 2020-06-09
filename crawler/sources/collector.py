@@ -1,6 +1,7 @@
 import json
 import logging.config
 from datetime import datetime
+from traceback import format_exc as trace
 
 from config import ALERT_FUNCTION, ALERT_SETTINGS, DB_INFO_ALERT_SETTINGS, MONGODB_CONNECTION, LOG_PATH
 from config import LOG_CONFIG, Logger
@@ -32,7 +33,13 @@ class Collector:
         for module in self.sources:
             ALERT_FUNCTION(f'Выполняется сохранение данных для источника {module.__name__}', **DB_INFO_ALERT_SETTINGS)
 
-            update_result = MONGODB_CONNECTION.update_mongo(module.database_path)
+            try:
+                update_result = MONGODB_CONNECTION.update_mongo(module.database_path)
+            except ValueError:
+                collector_logger.error(f'Ошибка при обновлении базы данными от источника {module.__name__}: {trace}')
+                collector_logger.warning(f'Этап сохранения данных из источника {module.__name__} будет пропущен',
+                                         alert=True)
+                continue
 
             with open(LOG_PATH / f'{module.__name__}_updated_{datetime.now().strftime("%d-%b-%Y_%H:%M:%S.%f")}.json',
                       'w') as reportf:

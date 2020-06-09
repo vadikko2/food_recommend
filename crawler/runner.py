@@ -25,25 +25,25 @@ if __name__ == '__main__':
     col = Collector(base_path=BASE_PATH, sources=DATA_SOURCES)
 
     if options.load:
-        logger.info('Action --load triggered', alert=True)
+        logger.info('Action --load triggered')
         ALERT_FUNCTION('Action --load triggered', **DB_INFO_ALERT_SETTINGS)
 
         col.load_all()  # TODO добавить какой-нибудь report об окончании загрузки с информацией о результатах
 
     if options.save:
-        logger.info('Action --save triggered', alert=True)
+        logger.info('Action --save triggered')
         ALERT_FUNCTION('Action --save triggered', **DB_INFO_ALERT_SETTINGS)
 
         report = col.save_all()
 
         ALERT_FUNCTION(report, **DB_INFO_ALERT_SETTINGS)
 
-        logger.info('Action --save completed', alert=True)
+        logger.info('Action --save completed')
 
         ALERT_FUNCTION('Action --save completed', **DB_INFO_ALERT_SETTINGS)
 
     if options.drop_elastic:
-        logger.info('Action --drop_elastic triggered', alert=True)
+        logger.info('Action --drop_elastic triggered')
         ALERT_FUNCTION('Action --drop_elastic triggered', **DB_INFO_ALERT_SETTINGS)
 
         ELASTICSEARCH_CONNECTION.delete()
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
         stanza.download('ru')
 
-        logger.info('Action --migrate triggered', alert=True)
+        logger.info('Action --migrate triggered')
         ALERT_FUNCTION('Action --migrate triggered', **DB_INFO_ALERT_SETTINGS)
 
         ELASTICSEARCH_CONNECTION.migrate()
