@@ -13,11 +13,8 @@ from tqdm import tqdm
 class EdimDoma:
     __name__ = 'edimdoma'
 
-    def __init__(self, base_path, logger, alert_function, alert_settings):
+    def __init__(self, base_path, logger):
         self.logger = logger
-
-        self.alert = alert_function
-        self.alert_settings = alert_settings
 
         self.url = "https://www.edimdoma.ru/retsepty?page=#"
         self.base_path = base_path / self.__name__
@@ -58,8 +55,7 @@ class EdimDoma:
                 self.parse_page(page)
             except Exception as e:
                 message = f'Ошибка при обработке страницы:\n {traceback.format_exc()}'
-                self.logger.error(message)
-                self.alert(message, **self.alert_settings)
+                self.logger.error(message, alert=True)
 
         '''
         Загружаем сами рецепты
@@ -69,8 +65,7 @@ class EdimDoma:
                 self.parse_recipes(url)
             except Exception as e:
                 message = f'Ошибка при парсинге страницы с рецептом:\n {traceback.format_exc()}'
-                self.logger.error(message)
-                self.alert(message, **self.alert_settings)
+                self.logger.error(message, alert=True)
 
     def parse_page(self, number):
         page_url = self.url.replace('#', str(number))

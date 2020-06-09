@@ -9,7 +9,7 @@ import datetime
 from mainapp.core.mail_service import send_email
 from mainapp.core.passwords import randomStringDigits
 
-from orm.mongo_client import FoodMongoClient
+from core.orm.mongo_client import FoodMongoClient
 
 auth = Blueprint("auth", __name__)
 

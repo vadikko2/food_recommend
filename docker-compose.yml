@@ -19,7 +19,7 @@ services:
     environment:
       - DOCKER=true
     volumes:
-      - ./alerts/:/alerts/
+      - ./core/:/core/
       - ./slackbot/:/slackbot/
     depends_on:
       - rabbitmq
@@ -54,8 +54,7 @@ services:
     environment:
       - DOCKER=true
     volumes:
-      - ./orm/:/orm/
-      - ./alerts/:/alerts/
+      - ./core/:/core/
       - ./api/:/api/
     depends_on:
       #- elasticsearch
@@ -69,9 +68,8 @@ services:
     environment:
       - DOCKER=true
     volumes:
-      - ./orm/:/orm/
+      - ./core/:/core/
       - ./database/:/database/
-      - ./alerts/:/alerts/
       - ./crawler/:/crawler/
 
     depends_on:

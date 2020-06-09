@@ -3,7 +3,7 @@ import sys
 from slackclient import SlackClient
 
 sys.path.append('../')
-from alerts.alert import Alerts
+from core.alerts.alert import Alerts
 import logging
 
 logger = logging.getLogger("test_assistant_slack_bot")

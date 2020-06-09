@@ -23,7 +23,7 @@ from models import models
 from config import ALERT_SETTINGS
 
 sys.path.append('../')
-from alerts.alert import alert
+from core.alerts.alert import alert
 
 '''
     Читаем конфиг для логера

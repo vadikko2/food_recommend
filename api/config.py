@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 
 sys.path.append('../')
-from orm.elastic_client import FoodElasticClient
-from orm.mongo_client import FoodMongoClient
+from core.orm.elastic_client import FoodElasticClient
+from core.orm.mongo_client import FoodMongoClient
 
 DATABASE_NAME = "food"
 
