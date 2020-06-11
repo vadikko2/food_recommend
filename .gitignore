@@ -4,3 +4,5 @@ database
 .idea/
 __pycache__/
 .gitignore
+stanza_resources
+elasticdata

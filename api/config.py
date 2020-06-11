@@ -24,7 +24,7 @@ if os.environ.get("DOCKER") == "true":
     WEB_PATH = Path("./templates/web")
 
     MONGODB_CONNECTION = FoodMongoClient("mongodb", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, "food",
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elasticsearch", 9200, "food",
                                                  "previews")  # TODO add docker image
     RABBIT_HOST = 'rabbitmq'
 
@@ -38,7 +38,7 @@ else:
     WEB_PATH = Path("./templates/web")
 
     MONGODB_CONNECTION = FoodMongoClient("localhost", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, "food", "previews")
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "localhost", 9200, "food", "previews")
 
     RABBIT_HOST = 'localhost'
 

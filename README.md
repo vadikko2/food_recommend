@@ -19,7 +19,7 @@
 - Update data
 
 ```
-    docker-compose run --rm -d crawler runner.py --load --save --drop_elastic --megrate
+    docker-compose run --rm -d crawler runner.py --load --save --drop_elastic --migrate
 ```
     
 - Run API

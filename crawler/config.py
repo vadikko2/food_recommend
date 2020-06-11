@@ -20,7 +20,7 @@ if os.environ.get("DOCKER") == "true":
     LOG_PATH = Path("./logs")  # папка с логами
     LOG_CONFIG = "./logging.ini"  # конфиг для логов
     MONGODB_CONNECTION = FoodMongoClient("mongodb", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, DATABASE_NAME,
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elasticsearch", 9200, DATABASE_NAME,
                                                  "previews")  # TODO add docker image
     RABBIT_HOST = 'rabbitmq'
 else:
@@ -28,7 +28,7 @@ else:
     LOG_PATH = Path("./logs")
     LOG_CONFIG = Path("./logging.ini")
     MONGODB_CONNECTION = FoodMongoClient("localhost", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elastic", 9200, DATABASE_NAME, "previews")
+    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "localhost", 9200, DATABASE_NAME, "previews")
     RABBIT_HOST = 'localhost'
 
 '''
@@ -69,5 +69,5 @@ ALERT_FUNCTION = alert
 '''
 DATA_SOURCES = dict(
     edimdoma=EdimDoma,
-    #edaru=EdaRu
+    edaru=EdaRu
 )

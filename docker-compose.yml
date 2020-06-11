@@ -39,7 +39,7 @@ services:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - discovery.type=single-node
     ports:
-      - "9200:9200"
+      - 9200:9200
     volumes:
       - ./elasticdata:/usr/share/elasticsearch/data
 
@@ -53,6 +53,7 @@ services:
     volumes:
       - ./core/:/core/
       - ./api/:/api/
+      - ./stanza_resources/:/root/stanza_resources
     depends_on:
       - elasticsearch
       - rabbitmq
@@ -68,6 +69,7 @@ services:
       - ./core/:/core/
       - ./database/:/database/
       - ./crawler/:/crawler/
+      - ./stanza_resources/:/root/stanza_resources
 
     depends_on:
       - rabbitmq
@@ -76,3 +78,7 @@ services:
       - elasticsearch
 
     entrypoint: python3
+
+volumes:
+  elasticdata:
+  stanza_resources:
