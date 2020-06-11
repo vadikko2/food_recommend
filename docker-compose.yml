@@ -16,17 +16,6 @@ services:
       - 5672:5672
       - 15672:15672
 
-  slack_bot:
-    build: slackbot/
-    command: python3 ./runner.py
-    environment:
-      - DOCKER=true
-    volumes:
-      - ./core/:/core/
-      - ./slackbot/:/slackbot/
-    depends_on:
-      - rabbitmq
-
   redis:
     image: "redis:5"
 
@@ -42,6 +31,17 @@ services:
       - 9200:9200
     volumes:
       - ./elasticdata:/usr/share/elasticsearch/data
+
+  slack_bot:
+    build: slackbot/
+    command: python3 ./runner.py
+    environment:
+      - DOCKER=true
+    volumes:
+      - ./core/:/core/
+      - ./slackbot/:/slackbot/
+    depends_on:
+      - rabbitmq
 
   api:
     build: api/

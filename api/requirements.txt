@@ -16,7 +16,7 @@ translate
 sklearn
 numpy
 pika==1.1.0
-#pymystem3
-#stanza
-#spacy_stanza
-#pymorphy2==0.8
+pymystem3
+stanza
+spacy_stanza
+pymorphy2==0.8
