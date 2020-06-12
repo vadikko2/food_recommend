@@ -26,7 +26,7 @@ def get_search():
                     previews = elastic.easy_query(query_string, skip, limit)
                 else:
                     # TODO uncomment
-                    previews = elastic.intelligence_query(query_string, skip, limit)
+                    previews = []#elastic.intelligence_query(query_string, skip, limit)
             previews = {"previews": previews, "sort_option": 1}
             return make_response(jsonify(previews), 200)
         except Exception as e:

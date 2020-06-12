@@ -3,9 +3,7 @@ import json
 import requests
 
 
-import stanza
-from spacy_stanza import StanzaLanguage
-
+# import stanza
 
 class FoodElasticClient:
 
@@ -14,10 +12,10 @@ class FoodElasticClient:
         self.index = index_name
         self.previews_index = previews_index_name
         self.mongodb = mongo_client
+
         # TODO uncomment
-        stanza.download('ru')  # download Russian model
-        self.snlp = stanza.Pipeline(lang="ru")
-        self.nlp = StanzaLanguage(self.snlp)
+        # self.snlp = stanza.Pipeline(lang="ru")
+        # self.nlp = StanzaLanguage(self.snlp)
         #
 
         self.preview_fields = {"id": "$id",
@@ -84,17 +82,17 @@ class FoodElasticClient:
             tags_set = set()
             for j, ingredient in enumerate(recipe["ingredients"]):
                 # TODO uncomment
-                #print(recipes,type(i), type(j))
-                l_ingredients_set.update(
-                   [word.lemma_ for word in self.nlp(ingredients[str(recipes[i]["ingredients"][j])].lower())])
+                # print(recipes,type(i), type(j))
+                # l_ingredients_set.update(
+                #    [word.lemma_ for word in self.nlp(ingredients[str(recipes[i]["ingredients"][j])].lower())])
                 ##
-                # ingredients_set.update(
-                #     ingredients[recipes[i]["ingredients"][j]].lower().split())
+                ingredients_set.update(
+                    ingredients[str(recipes[i]["ingredients"][j])].lower().split())
             for j, tag in enumerate(recipe["tags"]):
                 # TODO uncomment
-                l_tags_set.update([word.lemma_ for word in self.nlp(tags[str(recipes[i]["tags"][j])].lower())])
+                # l_tags_set.update([word.lemma_ for word in self.nlp(tags[str(recipes[i]["tags"][j])].lower())])
                 ##
-                tags_set.update(tags[recipes[i]["tags"][j]].lower().split())
+                tags_set.update(tags[str(recipes[i]["tags"][j])].lower().split())
 
             recipes[i]["l_ingredients"] = list(l_ingredients_set)
             recipes[i]["l_tags"] = list(l_tags_set)
@@ -103,16 +101,17 @@ class FoodElasticClient:
             recipes[i]["tags"] = list(tags_set)
 
             # TODO uncomment
-            recipes[i]["l_name"] = list(set([word.lemma_ for word in self.nlp(recipes[i]["name"].lower())]))
+            # recipes[i]["l_name"] = list(set([word.lemma_ for word in self.nlp(recipes[i]["name"].lower())]))
             ##
 
             recipes[i]["s_name"] = list(set(
                 recipes[i]["name"].lower().split()))
 
             # TODO uncomment
-            recipes[i]["l_author"] = list(set(
-                [word.lemma_ for word in self.nlp(recipes[i]["author"].lower())]))
+            # recipes[i]["l_author"] = list(set(
+            #     [word.lemma_ for word in self.nlp(recipes[i]["author"].lower())]))
             ##
+
             recipes[i]["s_author"] = list(set(
                 recipes[i]["author"].lower().split()))
         '''Составляем запрос на _bulk'''
@@ -183,7 +182,7 @@ class FoodElasticClient:
                 }
         }
 
-        words = list(set([word.lemma_ for word in self.nlp(req_string.lower())])) #req_string.lower().split() ## "".join(self.mystem.lemmatize(req_string.lower())[:-1]).split()
+        words = req_string.lower().split()  ##list(set([word.lemma_ for word in self.nlp(req_string.lower())]))
         for filed in ["s_name", "ingredients", "tags", "s_author"]:
             for word in words:
                 query_body["query"]["dis_max"]["queries"].append(
@@ -225,7 +224,7 @@ class FoodElasticClient:
         }
 
         # TODO uncomment
-        words = [word.lemma_ for word in self.nlp(req_string.lower())] ## []
+        words = []  ##[word.lemma_ for word in self.nlp(req_string.lower())]
 
         for filed in ["l_name", "l_ingredients", "l_tags", "l_author"]:
             for word in words:

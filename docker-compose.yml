@@ -9,6 +9,8 @@ services:
     environment:
       USER: root
       PASS: root
+    volumes:
+    - ./mongodata/:/data/db
 
   rabbitmq:
     image: rabbitmq:3.6-management-alpine
@@ -82,3 +84,4 @@ services:
 volumes:
   elasticdata:
   stanza_resources:
+  mongodata:

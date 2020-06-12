@@ -1,8 +1,11 @@
 venv
-database
+
 .DS_Store
 .idea/
 __pycache__/
-.gitignore
+
+logs
+database
 stanza_resources
 elasticdata
+mongodata

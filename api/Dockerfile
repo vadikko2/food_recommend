@@ -7,6 +7,6 @@ RUN apt-get install -y python3-setuptools
 
 COPY requirements.txt requirements.txt
 
-RUN python -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 WORKDIR /api

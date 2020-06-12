@@ -49,9 +49,9 @@ if __name__ == '__main__':
         ELASTICSEARCH_CONNECTION.delete()
 
     if options.migrate:
-        import stanza
-
-        stanza.download('ru')
+        # import stanza
+        #
+        # stanza.download('ru')
 
         logger.info('Action --migrate triggered')
         ALERT_FUNCTION('Action --migrate triggered', **DB_INFO_ALERT_SETTINGS)
