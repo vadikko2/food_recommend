@@ -2,7 +2,7 @@ from threading import Thread
 from flask_mail import Message
 from werkzeug.exceptions import InternalServerError
 
-from mainapp.app import app
+from mainapp.app import app, logger
 from mainapp.app import mail
 
 
@@ -11,6 +11,7 @@ def send_async_email(app, msg):
         try:
             mail.send(msg)
         except ConnectionRefusedError:
+            logger.error(InternalServerError("[MAIL SERVER] not working"))
             raise InternalServerError("[MAIL SERVER] not working")
 
 

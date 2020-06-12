@@ -1,9 +1,8 @@
 from flask import jsonify, make_response, request
-from mainapp.app import cache, elastic
+from mainapp.app import cache, elastic, logger
 from flask import Blueprint
 from flask_login import login_required
 from mainapp.core.coockies import cookie
-import traceback
 search = Blueprint("search", __name__)
 
 
@@ -30,7 +29,7 @@ def get_search():
             previews = {"previews": previews, "sort_option": 1}
             return make_response(jsonify(previews), 200)
         except Exception as e:
-            traceback.print_exc()
+            logger.error(f"Oops, something happen wrong in search method: {e}")
             return make_response(jsonify({"message": f"Oops, something happen wrong: {e}"}), 500)
     return search()
 

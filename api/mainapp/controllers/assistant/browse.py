@@ -1,16 +1,19 @@
-from flask import jsonify, make_response, request
-from mainapp.app import cache, db, rk2t, t2rk, kdtree, vectors
 from flask import Blueprint
+from flask import jsonify, make_response, request
 from flask_login import login_required, current_user
-from mainapp.core.recommendations.recommender import Recommend
+
+from mainapp.app import cache, db, rk2t, t2rk, kdtree, vectors, logger
 from mainapp.core.coockies import cookie
+from mainapp.core.recommendations.recommender import Recommend
 
 browse = Blueprint("browse", __name__)
 
 
 @browse.route("/assistant/browse", methods=["GET"])
+@login_required
 @cache.cached(query_string=True, timeout=100, key_prefix=f"browse/%s")
 def browse_page():
+    @cookie
     def page():
 
         skip = request.args.get("skip", default=0, type=int)
@@ -27,10 +30,11 @@ def browse_page():
                         {"$match": {"user": current_user.id}},
                         {"$group": {"_id": {"recipe": "$recipe"}}}
                     ])
-                except:
+                except Exception as e:
+                    logger.error(f'Ошибка при выборе любимых блюд: {e}')
                     favorites = []
 
-                if False:  # en(favorites): TODO раскомментировать. тут будут отдаваться рекоммендации от нашего алгоритма
+                if len(favorites):  # TODO раскомментировать. тут будут отдаваться рекоммендации от нашего алгоритма
                     recommendations = r.find_similar(rk2t, t2rk, kdtree, vectors, favorites, skip, limit)
                 else:
                     recommendations = r.get_previews("recipes",
@@ -60,14 +64,17 @@ def browse_page():
 
                 return make_response(jsonify(tops), 200)
         except Exception as e:
+            logger.error(f"Oops, something happen wrong: {e}")
             return make_response(jsonify({"message": f"Oops, something happen wrong: {e}"}), 500)
 
     return page()
 
 
+@login_required
 @browse.route("/assistant/browse/paginator/<view_type>", methods=["GET"])
 @cache.cached(query_string=True, timeout=100, key_prefix=f"browse/%s")
 def browse_paginator(view_type):
+    @cookie
     def paginator(view_type):
         skip = request.args.get("skip", default=0, type=int)
         limit = request.args.get("limit", default=10, type=int)
@@ -97,6 +104,7 @@ def browse_paginator(view_type):
                 previews = {"previews": previews, "sort_option": r.sort_options[view_type]}
                 return make_response(jsonify(previews), 200)
         except Exception as e:
+            logger.error(f"Oops, something happen wrong: {e}")
             return make_response(jsonify({"message": f"Oops, something happen wrong: {e}"}), 500)
 
     return paginator(view_type)

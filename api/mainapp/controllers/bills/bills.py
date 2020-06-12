@@ -3,7 +3,7 @@ import json
 import requests
 import hashlib
 from flask import jsonify, make_response, request
-from mainapp.app import cache, db, PHONE_NUMBER, BILL_PASS
+from mainapp.app import cache, db, PHONE_NUMBER, BILL_PASS, logger
 from mainapp.core.coockies import cookie
 from flask import Blueprint
 from flask_login import login_required, current_user
@@ -38,7 +38,7 @@ def verify():
         elif verify_status.status_code == 406:
             return make_response(jsonify({"message": "Bill not found or incorrect date or sum parameters."}), 406)
         else:
-            return make_response(verify_status.content, verify_status.status_code)
+            return make_response({"message": verify_status.content.decode()}, verify_status.status_code)
 
     return _verify()
 
@@ -66,6 +66,7 @@ def info():
             try:
                 bill_id, message = dump_bill(current_user.id, bill)
             except Exception as e:
+                logger.error(f'Ошибка записи чека в базу данных: {e}')
                 return make_response(str(ValueError(f'Ошибка записи чека в базу данных: {e}')), 500)
 
             return make_response(jsonify({"message": message, "id": bill_id}), 200)
@@ -124,6 +125,7 @@ def get_bill(bill):
         try:
             bill = db.find_one('bills', {"checksum": bill})
         except Exception as e:
+            logger.error(f'Ошибка при обращении к базе данных {str(e)}')
             make_response(jsonify({"message": f'Ошибка при обращении к базе данных {str(e)}'}, 500))
 
         if not bill: return make_response(jsonify({"message": "BIll not found."}), 404)

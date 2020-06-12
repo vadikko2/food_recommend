@@ -1,6 +1,5 @@
 import hashlib
 import json
-import logging.config
 import os
 import pickle
 

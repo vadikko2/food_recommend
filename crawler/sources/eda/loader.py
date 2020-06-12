@@ -250,7 +250,7 @@ class EdaRu:
         return self.add_checksum(db)
 
     def dump_json(self, _json, name):
-        print('Saving ' + str(name))
+        self.logger.info('Saving ' + str(name))
 
         with open(name, 'wt') as f:
             json.dump(_json, f, sort_keys=False, indent=4, ensure_ascii=False)
@@ -259,7 +259,7 @@ class EdaRu:
 
         page = 1
         while True:
-            if page > 10: break  # TODO remove
+            #if page > 10: break  # TODO remove
             self.logger.info("Loading page {}".format(page))
             search_url = self.get_recipes(page)
 

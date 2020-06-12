@@ -9,7 +9,7 @@ import datetime
 from mainapp.core.mail_service import send_email
 from mainapp.core.passwords import randomStringDigits
 
-from core.orm.mongo_client import FoodMongoClient
+from mainapp.app import logger, db, new_users_logger
 
 auth = Blueprint("auth", __name__)
 
@@ -39,6 +39,8 @@ def signup():
     try:
         r["email"], r["name"], r["password"]
     except:
+        logger.error(f"Incorrect request parameters set. Expected: email, name, password. "
+                       f"Gotten:{','.join(r.keys())}")
         return make_response(jsonify({
             "message": f"Incorrect request parameters set. Expected: email, name, password. "
                        f"Gotten:{','.join(r.keys())}"}), 401)
@@ -125,8 +127,10 @@ def confirm():
         sqlite_db.session.commit()
 
     except Exception as e:
+        logger.error(f"Account confirm error: {e}")
         return make_response(render_template("token_error.html", error=f"Account confirm error: {e}"), 401)
 
+    new_users_logger.info(f'Новый пользователь: {user.email}', alert=True)
     return make_response(render_template("confirm_successful_status.html", user=user.name, email=user.email), 200)
 
 
@@ -142,14 +146,13 @@ def reset():
         if not user_id:
             raise ValueError("unsuccessful id extraction from token.")
 
-        with FoodMongoClient() as fmc:
-            if fmc.find_all("reset_token", req={"user": user_id, "token": reset_token}):
-                raise ValueError("token has been already in used.")
+        if db.find_all("reset_token", req={"user": user_id, "token": reset_token}):
+            raise ValueError("token has been already in used.")
 
         user = User.query.filter(User.id == user_id).first()
 
         if not user:
-            raise ValueError("unknown user id.")
+            raise ValueError("Unknown user id.")
 
         new_password = randomStringDigits()
 
@@ -158,8 +161,7 @@ def reset():
 
         sqlite_db.session.commit()
 
-        with FoodMongoClient() as fmc:
-            fmc.easy_add("reset_token", document={"user": user_id, "token": reset_token})
+        db.easy_add("reset_token", document={"user": user_id, "token": reset_token})
 
         send_email("[TasteAssistant] Reset Your Password",
                    sender="tasteassistantbot@gmail.com",
@@ -169,6 +171,7 @@ def reset():
                    )
 
     except Exception as e:
+        logger.error(f"Password reset error: {e}")
         return make_response(render_template("token_error.html", error=f"Password reset error: {e}"), 401)
     return make_response(render_template("reset_successful_status.html", user=user.name, email=user.email), 200)
 
@@ -182,6 +185,8 @@ def change():
         try:
             old_password, new_password = r["old"], r["new"]
         except:
+            logger.error(f"Incorrect request parameters set. Expected: old, new. "
+                                                     f"Gotten: {','.join(r.keys())}")
             return make_response(jsonify({"message": f"Incorrect request parameters set. Expected: old, new. "
                                                      f"Gotten: {','.join(r.keys())}"}), 401)
 
@@ -194,6 +199,7 @@ def change():
 
             sqlite_db.session.commit()
         except Exception as e:
+            logger.error(f"Error during password updating: {e}")
             return make_response(jsonify({"message": f"Error during password updating: {e}"}), 500)
 
         resp = make_response(jsonify({"message": "Password has benn changed"}), 200)

@@ -1,6 +1,4 @@
 import json
-import logging.config
-import traceback
 
 import requests
 from flask import Flask, make_response, jsonify
@@ -17,20 +15,17 @@ from config import *
 from models import models
 
 '''
-    Иморт функции, кидающей алерты
-'''
-
-from config import ALERT_SETTINGS
-
-sys.path.append('../')
-from core.alerts.alert import alert
-
-'''
     Читаем конфиг для логера
 '''
 
 logging.config.fileConfig(LOG_CONFIG)
-logger = logging.getLogger("test_assistant_api")
+logger = Logger(logging.getLogger("test_assistant_api"),
+                ALERT_FUNCTION,
+                ALERT_SETTINGS)
+
+new_users_logger = Logger(logging.getLogger("test_assistant_api"),
+                          ALERT_FUNCTION,
+                          DB_INFO_ALERT_SETTINGS)
 
 '''
     Подключаемся к базам данных
@@ -40,10 +35,10 @@ try:
     db = MONGODB_CONNECTION
     sqlite_db = SQLITE_DB
     elastic = ELASTICSEARCH_CONNECTION
-except Exception:
-    message = f'Ошибка подключения к базам данных: {traceback.format_exc()}'
+except Exception as e:
+    message = f'Ошибка подключения к базам данных: {e}'
     logger.error(message)
-    alert(message, **ALERT_SETTINGS), exit()
+    exit()
 
 '''
     Выгрузка векторов для рекоммендаций
@@ -53,10 +48,10 @@ try:
     rn2t, rk2t, t2rn, t2rk = models.get_w2v_kdtree_dicts(MODELS_PATH)
     kdtree = models.get_w2v_kdtree(MODELS_PATH)
     vectors = models.get_vectors(MODELS_PATH)
-except Exception:
-    message = f'Ошибка чтения моделей файла с моделями: {traceback.format_exc()}'
+except Exception as e:
+    message = f'Ошибка чтения моделей файла с моделями: {e}'
     logger.error(message)
-    alert(message, **ALERT_SETTINGS), exit()
+    exit()
 
 '''
     Подключение к модулю, предоставлющему инфу по чекам
@@ -66,13 +61,13 @@ response = requests.get('https://proverkacheka.nalog.ru:9999/v1/mobile/users/log
                         auth=(PHONE_NUMBER, BILL_PASS))
 
 if not response.status_code == 200:
-    message = f'Ошибка авторизации в сервисе предоставления информации по чекам {response.content}'
+    message = f'Ошибка авторизации в сервисе предоставления информации по чекам {response.content.decode()}'
     logger.error(message)
-    alert(message, **ALERT_SETTINGS), exit()
 
-logger.info(
-    f'Успешная авторизация на proverkacheka.nalog.ru \n'
-    f'Ответ сервера: CODE {response.status_code} {json.dumps(json.loads(response.content), indent=4)}')
+else:
+    logger.info(
+        f'Успешная авторизация на proverkacheka.nalog.ru \n'
+        f'Ответ сервера: CODE {response.status_code} {json.dumps(json.loads(response.content.decode()), indent=4)}')
 
 '''
     Подключение к Redis
@@ -80,10 +75,10 @@ logger.info(
 
 try:
     cache = Cache(config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': f'redis://{REDIS_HOST}:{REDIS_PORT}/0'})
-except Exception:
-    message = f'Ошибка при подключении к Redis: {traceback.format_exc()}'
+except Exception as e:
+    message = f'Ошибка при подключении к Redis: {e}'
     logger.error(message)
-    alert(message, **ALERT_SETTINGS), exit()
+    exit()
 
 '''
     Запуск API
@@ -103,8 +98,8 @@ try:
         MAIL_SERVER="smtp.gmail.com",
         MAIL_PORT=587,
         MAIL_USE_TLS=True,
-        MAIL_USERNAME="tasteassistantbot@gmail.com",
-        MAIL_PASSWORD="Asusp535",
+        MAIL_USERNAME=SMTP_MAIL,
+        MAIL_PASSWORD=SMTP_PASSWORD,
     ))
 
     mail.init_app(app)
@@ -114,7 +109,6 @@ try:
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
-    sys.path.append(".")
     from mainapp.core.users.models import *
 
 
@@ -179,7 +173,7 @@ try:
         app.register_blueprint(search)
 
     SQLITE_DB.create_all(app=app)
-except Exception:
-    message = f'Ошибка при страте API: {traceback.format_exc()}'
+except Exception as e:
+    message = f'Ошибка при страте API: {e}'
     logger.error(message)
-    alert(message, **ALERT_SETTINGS), exit()
+    exit()

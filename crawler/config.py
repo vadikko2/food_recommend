@@ -2,8 +2,8 @@ import os
 import sys
 from pathlib import Path
 
-from sources.edimdoma.loader import EdimDoma
 from sources.eda.loader import EdaRu
+from sources.edimdoma.loader import EdimDoma
 
 sys.path.append('../')
 from core.orm.elastic_client import FoodElasticClient
@@ -19,16 +19,15 @@ if os.environ.get("DOCKER") == "true":
     BASE_PATH = Path("../database")  # куда сохранять обработанные файлы перед сохранением в базу
     LOG_PATH = Path("./logs")  # папка с логами
     LOG_CONFIG = "./logging.ini"  # конфиг для логов
-    MONGODB_CONNECTION = FoodMongoClient("mongodb", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "elasticsearch", 9200, DATABASE_NAME,
-                                                 "previews")  # TODO add docker image
+    MONGO_HOST = "mongodb"
+    ELASTICSEARCH_HOST = "elasticsearch"
     RABBIT_HOST = 'rabbitmq'
 else:
     BASE_PATH = Path("../database/")
     LOG_PATH = Path("./logs")
     LOG_CONFIG = Path("./logging.ini")
-    MONGODB_CONNECTION = FoodMongoClient("localhost", 27017, DATABASE_NAME)
-    ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, "localhost", 9200, DATABASE_NAME, "previews")
+    MONGO_HOST = "localhost"
+    ELASTICSEARCH_HOST = "localhost"
     RABBIT_HOST = 'localhost'
 
 '''
@@ -63,7 +62,6 @@ DB_INFO_ALERT_SETTINGS = dict(
 )
 ALERT_FUNCTION = alert
 
-
 '''
     Источники данных
 '''
@@ -71,3 +69,18 @@ DATA_SOURCES = dict(
     edimdoma=EdimDoma,
     edaru=EdaRu
 )
+
+import logging.config
+
+logging.config.fileConfig(LOG_CONFIG)
+
+'''
+    Подключение к базам данных
+'''
+MONGODB_CONNECTION = FoodMongoClient(MONGO_HOST, 27017, DATABASE_NAME)
+
+ELASTICSEARCH_CONNECTION = FoodElasticClient(MONGODB_CONNECTION, ELASTICSEARCH_HOST, 9200, DATABASE_NAME,
+                                             "previews",
+                                             Logger(logging.getLogger("elastic_search"),
+                                                    ALERT_FUNCTION,
+                                                    ALERT_SETTINGS))

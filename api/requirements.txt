@@ -12,6 +12,7 @@ urllib3==1.13.1
 Werkzeug==1.0.0
 redis
 tqdm
+json
 translate
 sklearn
 numpy

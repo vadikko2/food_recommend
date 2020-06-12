@@ -7,12 +7,12 @@ import requests
 
 class FoodElasticClient:
 
-    def __init__(self, mongo_client, host, port, index_name, previews_index_name):
+    def __init__(self, mongo_client, host, port, index_name, previews_index_name, logger):
         self.url = f"http://{host}:{port}"
         self.index = index_name
         self.previews_index = previews_index_name
         self.mongodb = mongo_client
-
+        self.logger = logger
         # TODO uncomment
         # self.snlp = stanza.Pipeline(lang="ru")
         # self.nlp = StanzaLanguage(self.snlp)
@@ -129,18 +129,18 @@ class FoodElasticClient:
                              headers={'content-type': 'application/json', 'charset': 'UTF-8'})
 
         if resp.status_code == 200:
-            print(f'Successful _bulk index')
+            self.logger.info(f'Successful _bulk index', alert=True)
         else:
-            print(
+            self.logger.error(
                 f'Error while _bulk index with code {resp.status_code}: '
                 f'{json.dumps(json.loads(resp.content), indent=4)}')
 
     def delete(self):
         resp = requests.delete(f"{self.url}/{self.index}")
         if resp.status_code == 200:
-            print(f'Successful delete index: {json.dumps(json.loads(resp.content), indent=4)}')
+            self.logger.info(f'Successful delete index: {json.dumps(json.loads(resp.content), indent=4)}', alert=True)
         else:
-            print(
+            self.logger.info(
                 f'Error while delete index with code {resp.status_code}: '
                 f'{json.dumps(json.loads(resp.content), indent=4)}')
 
@@ -156,10 +156,10 @@ class FoodElasticClient:
                                  headers={'content-type': 'application/json'})
 
         if not response.status_code == 200:
-            print(
+            raise ValueError(
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
-            return []
+
 
         response_body = json.loads(response.content)
         previews = []

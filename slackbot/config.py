@@ -17,6 +17,7 @@ ALERT_FLOWS = [
     dict(QUEUE_NAME='api-errors', SLACK_CHANNEL='#error-reports'),
     dict(QUEUE_NAME='crawler-errors', SLACK_CHANNEL='#crawler-error-reports'),
     dict(QUEUE_NAME='db-updates', SLACK_CHANNEL='#db-updates'),
+    dict(QUEUE_NAME='new-users', SLACK_CHANNEL='#new-users'),
 ]
 
 if os.environ.get("DOCKER") == "true":

@@ -30,6 +30,9 @@ if __name__ == '__main__':
 
         col.load_all()  # TODO добавить какой-нибудь report об окончании загрузки с информацией о результатах
 
+        logger.info('Action --load completed')
+        ALERT_FUNCTION('Action --load completed', **DB_INFO_ALERT_SETTINGS)
+
     if options.save:
         logger.info('Action --save triggered')
         ALERT_FUNCTION('Action --save triggered', **DB_INFO_ALERT_SETTINGS)
@@ -39,7 +42,6 @@ if __name__ == '__main__':
         ALERT_FUNCTION(report, **DB_INFO_ALERT_SETTINGS)
 
         logger.info('Action --save completed')
-
         ALERT_FUNCTION('Action --save completed', **DB_INFO_ALERT_SETTINGS)
 
     if options.drop_elastic:
@@ -47,6 +49,9 @@ if __name__ == '__main__':
         ALERT_FUNCTION('Action --drop_elastic triggered', **DB_INFO_ALERT_SETTINGS)
 
         ELASTICSEARCH_CONNECTION.delete()
+
+        logger.info('Action --drop_elastic completed')
+        ALERT_FUNCTION('Action --drop_elastic completed', **DB_INFO_ALERT_SETTINGS)
 
     if options.migrate:
         # import stanza
@@ -57,3 +62,6 @@ if __name__ == '__main__':
         ALERT_FUNCTION('Action --migrate triggered', **DB_INFO_ALERT_SETTINGS)
 
         ELASTICSEARCH_CONNECTION.migrate()
+
+        logger.info('Action --migrate completed')
+        ALERT_FUNCTION('Action --migrate completed', **DB_INFO_ALERT_SETTINGS)
