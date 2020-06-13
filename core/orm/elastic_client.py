@@ -73,7 +73,6 @@ class FoodElasticClient:
                 }
             ])])
         '''Формируем записи для эластика'''
-        previews_list = []
         for i, recipe in enumerate(recipes):
 
             l_ingredients_set = set()
@@ -160,12 +159,12 @@ class FoodElasticClient:
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
 
-
         response_body = json.loads(response.content)
         previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
+                     response_body["hits"]["hits"]))
+
         return previews
 
     def easy_query(self, req_string="", skip=0, limit=10):
@@ -205,8 +204,9 @@ class FoodElasticClient:
         response_body = json.loads(response.content)
         previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
+                     response_body["hits"]["hits"]))
+
         return previews
 
     def intelligence_query(self, req_string, skip=0, limit=10):
@@ -248,6 +248,7 @@ class FoodElasticClient:
         response_body = json.loads(response.content)
         previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
+                     response_body["hits"]["hits"]))
+
         return previews
