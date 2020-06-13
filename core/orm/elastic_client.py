@@ -197,7 +197,7 @@ class FoodElasticClient:
                                  headers={'content-type': 'application/json'})
 
         if not response.status_code == 200:
-            print(
+            self.logger.error(
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
             return []
@@ -240,7 +240,7 @@ class FoodElasticClient:
                                  headers={'content-type': 'application/json'})
 
         if not response.status_code == 200:
-            print(
+            self.logger.error(
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
             return []
