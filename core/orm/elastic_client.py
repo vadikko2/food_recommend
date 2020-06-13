@@ -160,10 +160,9 @@ class FoodElasticClient:
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
 
         response_body = json.loads(response.content)
-        previews = []
 
-        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
-                     response_body["hits"]["hits"]))
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
 
         return previews
 
@@ -202,10 +201,9 @@ class FoodElasticClient:
             return []
 
         response_body = json.loads(response.content)
-        previews = []
 
-        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
-                     response_body["hits"]["hits"]))
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
 
         return previews
 
@@ -246,9 +244,8 @@ class FoodElasticClient:
             return []
 
         response_body = json.loads(response.content)
-        previews = []
 
-        _ = list(map(lambda item: previews.append({**{"metric": item["_score"]}, **item["_source"]}),
-                     response_body["hits"]["hits"]))
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
 
         return previews
