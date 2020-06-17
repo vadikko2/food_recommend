@@ -73,7 +73,6 @@ class FoodElasticClient:
                 }
             ])])
         '''Формируем записи для эластика'''
-        previews_list = []
         for i, recipe in enumerate(recipes):
 
             l_ingredients_set = set()
@@ -160,12 +159,11 @@ class FoodElasticClient:
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
 
-
         response_body = json.loads(response.content)
-        previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
+
         return previews
 
     def easy_query(self, req_string="", skip=0, limit=10):
@@ -197,16 +195,16 @@ class FoodElasticClient:
                                  headers={'content-type': 'application/json'})
 
         if not response.status_code == 200:
-            print(
+            self.logger.error(
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
             return []
 
         response_body = json.loads(response.content)
-        previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
+
         return previews
 
     def intelligence_query(self, req_string, skip=0, limit=10):
@@ -240,14 +238,14 @@ class FoodElasticClient:
                                  headers={'content-type': 'application/json'})
 
         if not response.status_code == 200:
-            print(
+            self.logger.error(
                 f"ERROR searching in elasticsearch. Gotten status code {response.status_code}.\n"
                 f"Returned data: {json.dumps(json.loads(response.content), indent=4)}")
             return []
 
         response_body = json.loads(response.content)
-        previews = []
 
-        for item in response_body["hits"]["hits"]:
-            previews.append({**{"metric": item["_score"]}, **item["_source"]})
+        previews = list(map(lambda item: {**{"metric": item["_score"]}, **item["_source"]},
+                            response_body["hits"]["hits"]))
+
         return previews

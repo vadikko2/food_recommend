@@ -79,8 +79,9 @@ class FoodMongoClient:
 
     def tojson(self, _bson, garb_fields=['_id', 'checksum']):
         _json = json.loads(dumps(_bson))
-        for field in garb_fields:
-            _json = self.del_garb(_json, field)
+        _ = list(map(lambda field: self.del_garb(_json, field), garb_fields)) # TODO test
+        # for field in garb_fields:
+        #     self.del_garb(_json, field)
         return _json
 
     def del_garb(self, _json, key):
@@ -89,7 +90,6 @@ class FoodMongoClient:
         elif isinstance(_json, list):
             for i, item in enumerate(_json):
                 if key in _json[i]: del _json[i][key]
-        return _json
 
     def add(self, collection, document):
         checksums = self.db[collection].distinct("checksum")
