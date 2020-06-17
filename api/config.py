@@ -56,7 +56,7 @@ ALERT_SETTINGS = dict(
     queue_name=RABBIT_QUEUE_NAME
 )
 
-DB_INFO_ALERT_SETTINGS = dict(
+NEW_USERS_ALERT_SETTINGS = dict(
     host=RABBIT_HOST,
     port=RABBIT_PORT,
     login=RABBIT_LOGIN,

@@ -25,7 +25,7 @@ logger = Logger(logging.getLogger("test_assistant_api"),
 
 new_users_logger = Logger(logging.getLogger("test_assistant_api"),
                           ALERT_FUNCTION,
-                          DB_INFO_ALERT_SETTINGS)
+                          NEW_USERS_ALERT_SETTINGS)
 
 '''
     Подключаемся к базам данных
@@ -61,7 +61,7 @@ response = requests.get('https://proverkacheka.nalog.ru:9999/v1/mobile/users/log
                         auth=(PHONE_NUMBER, BILL_PASS))
 
 if not response.status_code == 200:
-    message = f'Ошибка авторизации в сервисе предоставления информации по чекам {response.content.decode()}'
+    message = f'Ошибка авторизации в сервисе предоставления информации по чекам: {response.content.decode()}'
     logger.error(message)
 
 else:

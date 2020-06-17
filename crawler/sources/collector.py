@@ -7,9 +7,17 @@ from config import ALERT_FUNCTION, ALERT_SETTINGS, DB_INFO_ALERT_SETTINGS, MONGO
 from config import LOG_CONFIG, Logger
 
 logging.config.fileConfig(LOG_CONFIG)
-collector_logger = Logger(logging.getLogger("test_assistant_crawler.collector"),
-                          ALERT_FUNCTION,
-                          ALERT_SETTINGS)
+errors_logger = Logger(
+    logging.getLogger("test_assistant_crawler.collector"),
+    ALERT_FUNCTION,
+    ALERT_SETTINGS
+)
+
+db_update_logger = Logger(
+    logging.getLogger("test_assistant_crawler.db_updater"),
+    ALERT_FUNCTION,
+    DB_INFO_ALERT_SETTINGS
+)
 
 
 class Collector:
@@ -25,20 +33,20 @@ class Collector:
     def load_all(self):
 
         for module in self.sources:
-            ALERT_FUNCTION(f'Выполняется загрузка данных из источника {module.__name__}', **DB_INFO_ALERT_SETTINGS)
+            db_update_logger.info(f'Выполняется загрузка данных из источника {module.__name__}', alert=True)
             module.load()
 
     def save_all(self):
         save_report = {}
         for module in self.sources:
-            ALERT_FUNCTION(f'Выполняется сохранение данных для источника {module.__name__}', **DB_INFO_ALERT_SETTINGS)
+            db_update_logger.info(f'Выполняется сохранение данных для источника {module.__name__}', alert=True)
 
             try:
                 update_result = MONGODB_CONNECTION.update_mongo(module.database_path)
             except ValueError:
-                collector_logger.error(f'Ошибка при обновлении базы данными от источника {module.__name__}: {trace}')
-                collector_logger.warning(f'Этап сохранения данных из источника {module.__name__} будет пропущен',
-                                         alert=True)
+                errors_logger.error(f'Ошибка при обновлении базы данными от источника {module.__name__}: {trace}')
+                errors_logger.warning(f'Этап сохранения данных из источника {module.__name__} будет пропущен',
+                                      alert=True)
                 continue
 
             with open(LOG_PATH / f'{module.__name__}_updated_{datetime.now().strftime("%d-%b-%Y_%H:%M:%S.%f")}.json',

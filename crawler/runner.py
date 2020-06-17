@@ -2,15 +2,14 @@ import argparse
 import logging.config
 import sys
 
-from config import ELASTICSEARCH_CONNECTION, BASE_PATH, DATA_SOURCES, ALERT_FUNCTION, \
-    ALERT_SETTINGS, DB_INFO_ALERT_SETTINGS
+from config import ELASTICSEARCH_CONNECTION, BASE_PATH, DATA_SOURCES, ALERT_FUNCTION, DB_INFO_ALERT_SETTINGS
 from config import LOG_CONFIG, Logger
 from sources.collector import Collector
 
 logging.config.fileConfig(LOG_CONFIG)
 logger = Logger(logging.getLogger("test_assistant_crawler.runner"),
                 ALERT_FUNCTION,
-                ALERT_SETTINGS)
+                DB_INFO_ALERT_SETTINGS)
 
 if __name__ == '__main__':
 
@@ -25,43 +24,35 @@ if __name__ == '__main__':
     col = Collector(base_path=BASE_PATH, sources=DATA_SOURCES)
 
     if options.load:
-        logger.info('Action --load triggered')
-        ALERT_FUNCTION('Action --load triggered', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --load triggered', alert=True)
 
         col.load_all()  # TODO добавить какой-нибудь report об окончании загрузки с информацией о результатах
 
-        logger.info('Action --load completed')
-        ALERT_FUNCTION('Action --load completed', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --load completed', alert=True)
 
     if options.save:
-        logger.info('Action --save triggered')
-        ALERT_FUNCTION('Action --save triggered', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --save triggered', alert=True)
 
         report = col.save_all()
 
-        ALERT_FUNCTION(report, **DB_INFO_ALERT_SETTINGS)
+        logger.info(report, alert=True)
 
-        logger.info('Action --save completed')
-        ALERT_FUNCTION('Action --save completed', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --save completed', alert=True)
 
     if options.drop_elastic:
-        logger.info('Action --drop_elastic triggered')
-        ALERT_FUNCTION('Action --drop_elastic triggered', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --drop_elastic triggered', alert=True)
 
         ELASTICSEARCH_CONNECTION.delete()
 
-        logger.info('Action --drop_elastic completed')
-        ALERT_FUNCTION('Action --drop_elastic completed', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --drop_elastic completed', alert=True)
 
     if options.migrate:
         # import stanza
         #
         # stanza.download('ru')
 
-        logger.info('Action --migrate triggered')
-        ALERT_FUNCTION('Action --migrate triggered', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --migrate triggered', alert=True)
 
         ELASTICSEARCH_CONNECTION.migrate()
 
-        logger.info('Action --migrate completed')
-        ALERT_FUNCTION('Action --migrate completed', **DB_INFO_ALERT_SETTINGS)
+        logger.info('Action --migrate completed', alert=True)
